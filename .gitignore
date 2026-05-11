@@ -1,0 +1,17 @@
+# Datos privados — NO subir
+config.py
+data/
+*.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

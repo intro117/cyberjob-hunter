@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberJob Hunter — Sergio Mera</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+  .header{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  .header h1{font-size:20px;font-weight:700;color:#fff}
+  .header h1 span{color:#60a5fa}
+  .header-right{display:flex;gap:10px;align-items:center;font-size:13px}
+  .badge{padding:4px 12px;border-radius:20px;font-weight:600;font-size:12px}
+  .badge-blue{background:#1d4ed822;border:1px solid #3b82f6;color:#93c5fd}
+  .badge-green{background:#15803d22;border:1px solid #22c55e;color:#86efac}
+  .badge-red{background:#dc262622;border:1px solid #ef4444;color:#fca5a5}
+  .badge-yellow{background:#b4510822;border:1px solid #f59e0b;color:#fcd34d}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;padding:16px 24px}
+  .stat{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;text-align:center}
+  .stat-n{font-size:28px;font-weight:700;color:#60a5fa}
+  .stat-l{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+  .tabs{display:flex;gap:4px;padding:0 24px 12px;flex-wrap:wrap}
+  .tab{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:#1e293b;color:#94a3b8;transition:.2s}
+  .tab.active{background:#1d4ed8;color:#fff}
+  .content{padding:0 24px 24px}
+  .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px;transition:.2s}
+  .card:hover{border-color:#475569}
+  .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .card-title{font-size:15px;font-weight:700;color:#f1f5f9}
+  .card-sub{font-size:12px;color:#94a3b8;margin-top:3px}
+  .card-right{text-align:right}
+  .salary{font-weight:700;color:#34d399;font-size:14px}
+  .match-bar{display:flex;align-items:center;gap:8px;margin:8px 0}
+  .match-track{flex:1;background:#334155;border-radius:99px;height:6px}
+  .match-fill{height:6px;border-radius:99px;transition:width .5s}
+  .match-pct{font-size:12px;font-weight:700;min-width:36px;text-align:right}
+  .desc{font-size:12px;color:#94a3b8;line-height:1.5;margin:8px 0}
+  .skills{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+  .skill{padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:#1d4ed822;color:#93c5fd;border:1px solid #1d4ed844}
+  .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.2s}
+  .btn-green{background:#15803d;color:#fff} .btn-green:hover{background:#166534}
+  .btn-blue{background:#1d4ed8;color:#fff} .btn-blue:hover{background:#1e40af}
+  .btn-purple{background:#7c3aed;color:#fff} .btn-purple:hover{background:#6d28d9}
+  .btn-gray{background:#334155;color:#94a3b8} .btn-gray:hover{background:#475569}
+  .btn-red{background:#991b1b;color:#fff} .btn-red:hover{background:#7f1d1d}
+  .fraud{background:#1e0a0a;border-color:#7f1d1d;opacity:.7}
+  .fraud .card-title{color:#fca5a5}
+  .modal{display:none;position:fixed;inset:0;background:#00000090;z-index:100;align-items:center;justify-content:center;padding:16px}
+  .modal.open{display:flex}
+  .modal-box{background:#1e293b;border:1px solid #475569;border-radius:14px;padding:24px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto}
+  .modal-title{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:16px}
+  .modal-body{font-size:14px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap}
+  .modal-actions{margin-top:16px;display:flex;gap:8px}
+  .loading{text-align:center;padding:24px;color:#94a3b8;font-size:14px}
+  .empty{text-align:center;padding:48px;color:#475569;font-size:14px}
+  .scraper-bar{background:#0f2744;border:1px solid #1d4ed844;border-radius:8px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;flex-wrap:wrap;gap:8px}
+  a{color:#60a5fa;text-decoration:none} a:hover{text-decoration:underline}
+  .tag-plat{padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600}
+  .tp-ct{background:#7c3aed22;color:#c4b5fd;border:1px solid #7c3aed44}
+  .tp-ro{background:#059669 22;color:#6ee7b7;border:1px solid #05966944}
+  .tp-occ{background:#b4510822;color:#fcd34d;border:1px solid #f59e0b44}
+  .tp-ab{background:#0891b222;color:#67e8f9;border:1px solid #0891b244}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🛡️ Cyber<span>Job</span> Hunter</h1>
+    <div style="font-size:12px;color:#93c5fd;margin-top:3px">Sergio Iván Mera Aguilar · Ciberseguridad & IT · 10+ años</div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-blue" id="stat-pendientes">… pendientes</span>
+    <span class="badge badge-green" id="stat-aprobadas">… aprobadas</span>
+    <span id="last-update" style="color:#64748b;font-size:11px"></span>
+  </div>
+</div>
+
+<div class="stats" id="stats-row">
+  <div class="stat"><div class="stat-n" id="s-total">–</div><div class="stat-l">Total vacantes</div></div>
+  <div class="stat"><div class="stat-n" id="s-pend">–</div><div class="stat-l">Pendientes</div></div>
+  <div class="stat"><div class="stat-n" id="s-aprob" style="color:#34d399">–</div><div class="stat-l">Aprobadas</div></div>
+  <div class="stat"><div class="stat-n" id="s-rech" style="color:#f87171">–</div><div class="stat-l">Rechazadas</div></div>
+  <div class="stat"><div class="stat-n" id="s-block" style="color:#fbbf24">–</div><div class="stat-l">Bloqueadas</div></div>
+  <div class="stat"><div class="stat-n" id="s-match" style="color:#a78bfa">–%</div><div class="stat-l">Match promedio</div></div>
+</div>
+
+<div style="padding:0 24px 8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+  <button class="btn btn-blue" onclick="runScraper()">🔄 Buscar vacantes ahora</button>
+  <span id="scraper-status" style="font-size:12px;color:#64748b"></span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setTab('pendientes')">🔍 Pendientes</button>
+  <button class="tab" onclick="setTab('aprobadas')">✅ Aprobadas</button>
+  <button class="tab" onclick="setTab('rechazadas')">✕ Descartadas</button>
+  <button class="tab" onclick="setTab('bloqueadas')">⚠️ Bloqueadas</button>
+</div>
+
+<div class="content" id="content">
+  <div class="loading">Cargando vacantes...</div>
+</div>
+
+<!-- Modal carta / entrevista -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Generando...</div>
+    <div class="modal-body" id="modal-body"><div class="loading">⏳ Llamando a Claude AI...</div></div>
+    <div class="modal-actions">
+      <button class="btn btn-blue" onclick="copyModal()">📋 Copiar</button>
+      <button class="btn btn-gray" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let vacantes = [];
+let tabActual = "pendientes";
+
+const platClass = {
+  "Computrabajo":"tp-ct","RemoteOK":"tp-ro","OCC Mundial":"tp-occ","Arbeitnow":"tp-ab"
+};
+
+function matchColor(p){
+  if(p>=80) return "#34d399";
+  if(p>=60) return "#60a5fa";
+  if(p>=40) return "#fbbf24";
+  return "#f87171";
+}
+
+async function loadData(){
+  try{
+    const r = await fetch("/api/vacantes");
+    vacantes = await r.json();
+    const s = await fetch("/api/stats").then(r=>r.json());
+    document.getElementById("s-total").textContent  = s.total;
+    document.getElementById("s-pend").textContent   = s.pendientes;
+    document.getElementById("s-aprob").textContent  = s.aprobadas;
+    document.getElementById("s-rech").textContent   = s.rechazadas;
+    document.getElementById("s-block").textContent  = s.bloqueadas;
+    document.getElementById("s-match").textContent  = s.match_avg+"%";
+    document.getElementById("stat-pendientes").textContent = s.pendientes+" pendientes";
+    document.getElementById("stat-aprobadas").textContent  = s.aprobadas+" aprobadas";
+    document.getElementById("last-update").textContent = "Actualizado: "+new Date().toLocaleTimeString("es-MX");
+    render();
+  }catch(e){
+    document.getElementById("content").innerHTML = '<div class="empty">Error conectando al servidor. ¿Está corriendo api/server.py?</div>';
+  }
+}
+
+function setTab(t){
+  tabActual = t;
+  document.querySelectorAll(".tab").forEach((b,i)=>{
+    b.classList.toggle("active", ["pendientes","aprobadas","rechazadas","bloqueadas"][i]===t);
+  });
+  render();
+}
+
+function render(){
+  let lista = vacantes.filter(v=>{
+    if(tabActual==="pendientes")  return v.empresa_validada && v.estado==="pendiente";
+    if(tabActual==="aprobadas")   return v.estado==="aprobada";
+    if(tabActual==="rechazadas")  return v.estado==="rechazada";
+    if(tabActual==="bloqueadas")  return !v.empresa_validada;
+    return true;
+  });
+  lista.sort((a,b)=>b.match-a.match);
+
+  if(!lista.length){
+    document.getElementById("content").innerHTML = '<div class="empty">No hay vacantes en esta categoría.<br>Haz clic en "Buscar vacantes ahora" para encontrar nuevas.</div>';
+    return;
+  }
+
+  document.getElementById("content").innerHTML = lista.map(v=>cardHTML(v)).join("");
+}
+
+function cardHTML(v){
+  const mc = matchColor(v.match);
+  const pc = platClass[v.plataforma]||"tp-ct";
+  const skills = (v.requiere||[]).map(s=>`<span class="skill">${s}</span>`).join("");
+  const fraud  = !v.empresa_validada;
+
+  let acciones = "";
+  if(tabActual==="pendientes"){
+    acciones = `
+      <button class="btn btn-green" onclick="aprobar('${v.id}')">✅ Aprobar</button>
+      <button class="btn btn-blue" onclick="generarCarta('${v.id}')">✉️ Carta IA</button>
+      <button class="btn btn-purple" onclick="practicar('${v.id}')">🎯 Entrenar</button>
+      <button class="btn btn-gray" onclick="rechazar('${v.id}')">✕ Descartar</button>`;
+  } else if(tabActual==="aprobadas"){
+    acciones = `
+      <a href="${v.url}" target="_blank" class="btn btn-green">🔗 Abrir oferta</a>
+      <button class="btn btn-blue" onclick="generarCarta('${v.id}')">✉️ Carta IA</button>
+      <button class="btn btn-purple" onclick="practicar('${v.id}')">🎯 Entrenar entrevista</button>`;
+  }
+
+  return `<div class="card${fraud?' fraud':''}">
+    <div class="card-header">
+      <div>
+        <div class="card-title">${v.puesto}</div>
+        <div class="card-sub">🏢 ${v.empresa} &nbsp;·&nbsp; 📍 ${v.ubicacion} &nbsp;·&nbsp; 🕐 ${v.fecha_publicacion||"Reciente"}</div>
+      </div>
+      <div class="card-right">
+        <div class="salary">${v.salario||"Ver oferta"}</div>
+        <span class="tag-plat ${pc}" style="margin-top:4px;display:inline-block">${v.plataforma}</span>
+      </div>
+    </div>
+    <div class="match-bar">
+      <div class="match-track"><div class="match-fill" style="width:${v.match}%;background:${mc}"></div></div>
+      <span class="match-pct" style="color:${mc}">${v.match}%</span>
+    </div>
+    <div class="desc">${(v.descripcion||"").slice(0,200)}${v.descripcion?.length>200?"...":""}</div>
+    ${skills ? `<div class="skills">${skills}</div>` : ""}
+    ${fraud ? `<div style="color:#f87171;font-size:12px;margin-top:6px">⚠️ ${v.razon_rechazo}</div>` : ""}
+    ${acciones ? `<div class="actions">${acciones}</div>` : ""}
+  </div>`;
+}
+
+async function aprobar(id){
+  await fetch(`/api/vacantes/${id}/estado`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({estado:"aprobada"})});
+  loadData();
+}
+async function rechazar(id){
+  await fetch(`/api/vacantes/${id}/estado`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({estado:"rechazada"})});
+  loadData();
+}
+
+function getVacante(id){ return vacantes.find(v=>v.id===id); }
+
+function openModal(title, content){
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-body").textContent  = content;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal(){ document.getElementById("modal").classList.remove("open"); }
+function copyModal(){ navigator.clipboard.writeText(document.getElementById("modal-body").textContent); }
+
+async function callClaude(prompt){
+  document.getElementById("modal-body").innerHTML = '<div class="loading">⏳ Claude está escribiendo...</div>';
+  const r = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user",content:prompt}]
+    })
+  });
+  const d = await r.json();
+  return d.content?.[0]?.text || "Error en la respuesta de Claude.";
+}
+
+async function generarCarta(id){
+  const v = getVacante(id);
+  if(!v) return;
+  document.getElementById("modal-title").textContent = `✉️ Carta — ${v.puesto} @ ${v.empresa}`;
+  document.getElementById("modal-body").innerHTML = '<div class="loading">⏳ Generando carta personalizada...</div>';
+  document.getElementById("modal").classList.add("open");
+
+  const texto = await callClaude(`Eres experto en cartas de presentación para ciberseguridad e IT.
+
+Escribe una carta de presentación profesional en español para:
+
+CANDIDATO: Sergio Iván Mera Aguilar
+- 10+ años en ciberseguridad, redes y administración de sistemas
+- Skills: Wazuh, Suricata, ELK Stack, ISO 27001, Kali Linux, Fortinet, pfSense, Docker, Linux, Grafana, Prometheus
+- Último puesto: Supervisor de Administración de Sistemas en Erillam Healthcare
+- Antes: Subdirector de TI en gobierno estatal, coordinó con ITAM
+- Proyectos: implementó SIEM, honeypots, sistemas de monitoreo con Prometheus+Grafana
+
+VACANTE:
+- Puesto: ${v.puesto}
+- Empresa: ${v.empresa}
+- Ubicación: ${v.ubicacion}
+- Descripción: ${v.descripcion}
+- Skills requeridos: ${(v.requiere||[]).join(", ")}
+
+INSTRUCCIONES:
+- Máximo 4 párrafos cortos
+- Tono humano y directo, NO corporativo
+- Párrafo 1: por qué me interesa ESTA empresa y ESTE puesto específicamente
+- Párrafo 2: 2 logros concretos que se alinean con los requisitos
+- Párrafo 3: qué aportaré en los primeros 90 días
+- Párrafo 4: cierre natural con llamada a acción
+- No uses "me complace", "adjunto mi CV", "estimado departamento"
+- Menciona herramientas específicas de la vacante`);
+
+  document.getElementById("modal-body").textContent = texto;
+}
+
+async function practicar(id){
+  const v = getVacante(id);
+  if(!v) return;
+  document.getElementById("modal-title").textContent = `🎯 Entrevista — ${v.puesto} @ ${v.empresa}`;
+  document.getElementById("modal-body").innerHTML = '<div class="loading">⏳ Preparando preguntas de entrevista...</div>';
+  document.getElementById("modal").classList.add("open");
+
+  const texto = await callClaude(`Eres coach de entrevistas para ciberseguridad e IT.
+
+Genera 5 preguntas de entrevista técnica + 2 conductuales para:
+
+PUESTO: ${v.puesto}
+EMPRESA: ${v.empresa}
+DESCRIPCIÓN: ${v.descripcion}
+SKILLS REQUERIDOS: ${(v.requiere||[]).join(", ")}
+
+CANDIDATO: Sergio Iván Mera Aguilar
+- 10+ años en ciberseguridad e infraestructura
+- Implementó SIEM con Wazuh, Suricata, ELK
+- ISO 27001, Kali Linux, Fortinet, pfSense, Docker, Linux
+- Subdirector de TI en gobierno, coordinó con ITAM
+- Supervisor en Erillam Healthcare
+
+Para cada pregunta incluye:
+[PREGUNTA]: La pregunta
+[RESPUESTA MODELO]: Cómo debería responder Sergio (2-3 párrafos, tono natural, con ejemplos reales de su experiencia)
+[TIP]: Un consejo corto para esa respuesta
+
+Formato claro con separadores entre preguntas.`);
+
+  document.getElementById("modal-body").textContent = texto;
+}
+
+async function runScraper(){
+  document.getElementById("scraper-status").textContent = "⏳ Scraper iniciado, espera 3-5 minutos...";
+  try{
+    await fetch("/api/scraper/run");
+    setTimeout(()=>{
+      document.getElementById("scraper-status").textContent = "✓ Completado";
+      loadData();
+    }, 180000); // recargar después de 3 min
+  }catch(e){
+    document.getElementById("scraper-status").textContent = "Error iniciando scraper";
+  }
+}
+
+// Cargar al inicio y refrescar cada 30s
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>
