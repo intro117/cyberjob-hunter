@@ -432,6 +432,8 @@ MIT License — libre para uso personal y comercial.
 
 ## Autor
 
+Ivan Mera :)
+
 Desarrollado como proyecto de automatización de búsqueda de empleo en ciberseguridad.
 
 *Powered by Claude AI (Anthropic) + Python + BeautifulSoup*
