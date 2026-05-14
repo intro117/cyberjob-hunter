@@ -10,7 +10,7 @@
 
 ---
 
-## 📋 Tabla de contenidos
+##  Tabla de contenidos
 
 1. [¿Qué hace este sistema?](#qué-hace)
 2. [Arquitectura](#arquitectura)
@@ -32,12 +32,12 @@ CyberJob Hunter es una plataforma que automatiza el proceso de búsqueda de empl
 
 | Módulo | Función |
 |---|---|
-| 🔍 **Scraper** | Busca vacantes en Computrabajo, OCC, RemoteOK y Arbeitnow |
-| 🛡️ **Validador** | Detecta y bloquea ofertas fraudulentas automáticamente |
-| 🧠 **Match IA** | Califica cada vacante según tu perfil (0-99%) |
-| ✉️ **Carta IA** | Genera carta de presentación personalizada por vacante |
-| 🎯 **Entrevista IA** | Prepara preguntas y respuestas modelo para cada empresa |
-| ✅ **Cola de aprobación** | Tú decides qué vacantes aprobar antes de aplicar |
+|  **Scraper** | Busca vacantes en Computrabajo, OCC, RemoteOK y Arbeitnow |
+|  **Validador** | Detecta y bloquea ofertas fraudulentas automáticamente |
+|  **Match IA** | Califica cada vacante según tu perfil (0-99%) |
+|  **Carta IA** | Genera carta de presentación personalizada por vacante |
+|  **Entrevista IA** | Prepara preguntas y respuestas modelo para cada empresa |
+|  **Cola de aprobación** | Tú decides qué vacantes aprobar antes de aplicar |
 
 ---
 
@@ -262,7 +262,7 @@ PERFIL = {
 3. Menú izquierdo → **API Keys**
 4. Clic **Create Key** → ponle nombre `cyberjob-hunter`
 5. **Copia la key** (empieza con `sk-ant-...`)
-   > ⚠️ Solo se muestra una vez — guárdala en un lugar seguro
+   >  Solo se muestra una vez — guárdala en un lugar seguro
 6. Pégala en `api/server.py`:
    ```python
    ANTHROPIC_API_KEY = "sk-ant-TU-KEY-AQUI"
@@ -306,26 +306,26 @@ crontab -e
 
 ## Cómo usar el dashboard
 
-### Pestaña 🔍 Pendientes
+### Pestaña  Pendientes
 - Lista de vacantes encontradas ordenadas por % de match
 - **Aprobar** → pasa a cola de aprobadas
 - **Carta IA** → Claude genera carta personalizada para esa empresa
 - **Entrenar** → Claude genera preguntas y respuestas de entrevista
 - **Descartar** → la vacante se archiva
 
-### Pestaña ✅ Aprobadas
+### Pestaña  Aprobadas
 - Vacantes que aprobaste listas para aplicar
 - Botón **Abrir oferta** → va directo a la página de la empresa
 - Puedes generar carta y entrenar entrevista desde aquí
 
-### Pestaña ⚠️ Bloqueadas
+### Pestaña  Bloqueadas
 - Ofertas detectadas como posible fraude
 - El sistema las bloquea automáticamente por señales como:
   - "sin experiencia y gana miles"
   - "inversión inicial requerida"
   - Empresa sin nombre válido
 
-### Botón 🔄 Buscar vacantes ahora
+### Botón  Buscar vacantes ahora
 - Lanza el scraper en background
 - Espera 3-5 minutos
 - El dashboard se actualiza automáticamente
@@ -403,6 +403,101 @@ python api/server.py
 ip addr show eth0 | grep "inet "
 # Si localhost no funciona, usar la IP de WSL directamente
 ```
+---
+
+
+
+
+##  Configurar Claude AI (requerido para cartas y entrevistas)
+
+CyberJob Hunter usa **Claude AI de Anthropic** para generar cartas de presentación
+personalizadas y prepararte para entrevistas técnicas.
+
+>  Sin esta configuración el sistema igual funciona — puedes buscar vacantes,
+> aprobarlas y verlas en el dashboard. Solo las funciones de IA no estarán disponibles.
+
+---
+
+### ¿Qué necesitas?
+
+Una **API Key de Anthropic** — es diferente a la suscripción de Claude.ai Pro.
+Son dos productos separados:
+
+| Producto | Para qué sirve | Costo |
+|---|---|---|
+| **Claude.ai** (chat) | Hablar con Claude en el navegador | $20/mes |
+| **API de Anthropic** | Que tus apps usen Claude | Por uso |
+
+Para CyberJob Hunter necesitas la **API**, no la suscripción de chat.
+
+---
+
+### Pasos para obtener tu API Key
+
+**1. Crear cuenta en Anthropic Console**
+```
+Ve a: https://console.anthropic.com
+→ Sign up con tu email (o Google/GitHub)
+→ Verifica tu email
+```
+
+**2. Agregar crédito**
+```
+console.anthropic.com → Billing → Add credit
+→ Mínimo recomendado: $5 USD
+→ Con $5 puedes generar ~1,600 cartas/entrevistas
+→ Solo pagas lo que usas (no hay cobro mensual fijo)
+```
+
+**3. Generar tu API Key**
+```
+console.anthropic.com → API Keys → Create Key
+→ Nombre: cyberjob-hunter
+→ Clic Create Key
+→ COPIA LA KEY — solo se muestra una vez
+   Empieza con: sk-ant-...
+```
+
+**4. Pegar la key en el servidor**
+```bash
+nano api/server.py
+# Busca esta línea:
+ANTHROPIC_API_KEY = "sk-ant-XXXXXXXXXXXXXXXXXXXXXXXX"
+# Reemplaza con tu key real
+# Guarda: Ctrl+O → Enter → Ctrl+X
+```
+
+**5. Reiniciar el servidor**
+```bash
+cd ~/cyberjob-hunter
+source venv/bin/activate
+python api/server.py
+```
+
+---
+
+### ¿Cuánto cuesta en la práctica?
+
+El modelo usado es **Claude Sonnet** — uno de los más económicos:
+
+| Acción | Costo aproximado |
+|---|---|
+| Generar 1 carta de presentación | ~$0.003 USD |
+| Preparar 1 sesión de entrevista | ~$0.004 USD |
+| 100 cartas + 100 entrevistas | ~$0.70 USD |
+
+Con **$5 USD** tienes suficiente para varios meses de uso normal.
+
+---
+
+### Verificar que funciona
+
+Una vez configurada la key, entra al dashboard y haz clic en
+**✉️ Carta IA** en cualquier vacante aprobada. Si genera la carta, todo está correcto.
+
+Si ves un error `API key inválida`, verifica que copiaste la key completa
+incluyendo el prefijo `sk-ant-`.
+
 
 ---
 
